@@ -1,25 +1,6 @@
-# Define variables
-TARGET = a
-LIBS = -lm
 CC = gcc
-CFLAGS = -g -Wall
+TARGET = a
+CFLAGS = -Wall
 
-.PHONY: default all clean
-
-default: $(TARGET)
-all: default
-
-OBJECTS = $(patsubst %.c, %.o, $(wildcard src/*.c))
-HEADERS = $(wildcard src/*.h)
-
-%.o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-.PRECIOUS: $(TARGET) $(OBJECTS)
-
-$(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
-
-clean:
-	-rm -f src/*.o
-	-rm -f $(TARGET)
+$(TARGET): ./src/main.c ./src/document_buffer.c ./src/input_handler.c
+	$(CC) ./src/main.c -o $(TARGET) $(CFLAGS)

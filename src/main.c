@@ -1,107 +1,72 @@
+#include <stddef.h>
 #include <stdio.h>
+#include <ctype.h>
+#include <termios.h>
 #include <stdlib.h>
-#include <string.h>
-#include "help.h"
-#include "main.h"
-#include "editor.h"
+#include <unistd.h>
 
-void emptyInputBuffer(){
-	while (getchar() != '\n'){
-		
-	}
+#include "document_buffer.c"
+#include "input_handler.c"
+
+struct termios orig_termios;
+
+void disableRawMode(){
+	tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
-static char switchMode(char* input){
-	char mode;
-	if (input[0] == 'i'){
-		mode = 'i';
-	}else if (input[0] == 'q'){
-		mode = 'q';
-	}else if (input[0] == 'o'){
-		mode = 'o';
-	}else if (strcmp(input, "-h")==0){
-		mode = 'h';	
-	}else if (input[0] == ':'){
-		mode = ':';
-	}else{
-		mode = 'n';
-	}
-	return mode;
+void enableRawMode(){
+	atexit(disableRawMode);
+	
+	tcgetattr(STDIN_FILENO, &orig_termios);
+	struct termios raw;
+	raw = orig_termios;
+
+	raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+	raw.c_oflag &= ~(OPOST);
+	raw.c_cflag |= ~(CS8); 
+	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+	raw.c_cc[VMIN] = 0;
+	raw.c_cc[VTIME] = 1; 
+
+	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
-int main(int argc, char** argv){
-	// Inputs: expects a file name
-	FILE *fptr;
-	//fptr = fopen(argv[1], "r");
-	fptr = fopen("test.txt", "r");
-
-	// Modes
-	/*List of modes:
-		n : normal mode
-			controls: h move cursor left, 
-						j move cursor down line
-						k move cursror up line
-						l move cursor right
-	 * i : insert
-	  		scanf a single line of input text. Append at cursor.
-		q : Quit mode : if in this mode, program exits
-		h : Help mode : displays help page
-	*/
-	char mode = 'n'; 
-
-	// Initialize String buffer to store input and cursor
-	char buffer[DOC_BUFFER] = {0};
-	int c;
-	Cursor *cursor = (Cursor* )malloc(sizeof(Cursor));
-	while((c = getc(fptr)) != EOF){
-		buffer[cursor->left] = c;
-		cursor->left += 1;
-	}
-	cursor->right = DOC_BUFFER - 1;
-	strcpy(cursor->filename, "test.txt");
-	fclose(fptr);
-
-	system("clear");
-	printBuffer(buffer, cursor);
-
-	// Main Driver
-	char input[INPUT_BUFFER] = {0};
-	while (mode != 'q'){
-		switch (mode){
-			case 'n':
-				printf("(Normal): ");
-				scanf("%s", input);
-				emptyInputBuffer();
-				if (input[0]=='h' || input[0]=='l' || input[0]=='j' || input[0]=='k'){
-					moveCursor(buffer, input, cursor);
-				}else{
-					mode = switchMode(input);
-				}
-				break;
-			case 'i':
-				printf("(Insert): ");
-				scanf("%[^\n]s", input);
-				emptyInputBuffer();
-				writeBuffer(buffer, input, cursor);
-				mode = 'n';
-				break;
-			case 'o':
-				addLinebreak(buffer, cursor);
-				mode = 'n';
-				break;
-			case 'h':
-				helpMode();
-				mode = 'n';
-				break;
-			case ':':
-				commandMode(buffer, cursor, input[1]);
-				mode = 'n';
-				break;
-
+void print_inputs(char c){
+		if (iscntrl(c)){
+			printf("%d\r\n", c);
 		}
+		else{
+			printf("%d ('%c')\r\n", c, c);
+		}
+}
 
-		system("clear");
-		printBuffer(buffer, cursor);
-	}
+void clear_screen(){
+	printf("\033c");
+}
+
+int main(){
+	enableRawMode();
+
+	// Read file
+	char filename[100] = "test.txt";
+	printf("%s\r\n", filename);
+
+	DocBuffer *doc_buf;
+	doc_buf = (DocBuffer*)malloc(sizeof(DocBuffer));
+	read_text_file(filename, doc_buf);
+	print_buffer(doc_buf);
+
+	// Initialize DocunemtBuffer Struct
+
+	char c;
+	while (1) {
+		c = '\0';
+		read(STDIN_FILENO, &c, 1); 
+		handle_inputs(c, doc_buf);
+		clear_screen();
+		//print_inputs(c);
+		print_buffer(doc_buf);
+		if (c == 'q') break;	
+	};
 	return 0;
 }
