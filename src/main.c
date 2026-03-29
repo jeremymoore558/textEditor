@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "document_buffer.c"
-#include "input_handler.c"
+#include "document_buffer.h"
+#include "input_handler.h"
 
 struct termios orig_termios;
 

@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include "document_buffer.h"
+
 void cursor_motion(char c, DocBuffer* doc_buf){
 	int new_line_counter;
 	switch (c){
@@ -50,12 +53,17 @@ void cursor_motion(char c, DocBuffer* doc_buf){
 	}		
 }
 
+void insert_mode(DocBuffer* doc_buf){
+	//TODO Finish
+	printf("Insert Mode");
+}
+
 void handle_inputs(char c, DocBuffer* doc_buf){
 	switch (c){
 		case 'q':
 			return;
 		case 'i':
-			printf("Would Enter Insert Mode\r\n");
+			insert_mode(doc_buf);
 			return;
 		default:
 			cursor_motion(c, doc_buf);
