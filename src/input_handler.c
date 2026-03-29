@@ -1,5 +1,33 @@
-#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
 #include "document_buffer.h"
+#include "main.h"
+
+void write_char_to_buffer(char c, DocBuffer* doc_buf){
+	if (c == '\0'){return;}
+
+	doc_buf->cursor.left += 1;
+	doc_buf->buffer[doc_buf->cursor.left] = c;
+}
+
+void insert_mode(DocBuffer* doc_buf){
+	//TODO Finish
+	char c;
+	while (1){
+		c = '\0';
+		read(STDIN_FILENO, &c, 1);
+
+		if (c == 27){
+			break;
+		}else if (c == 13){
+			write_char_to_buffer('\n', doc_buf);
+		}else{
+			write_char_to_buffer(c, doc_buf);
+		}
+		clear_screen();
+		print_buffer(doc_buf);
+	}
+}
 
 void cursor_motion(char c, DocBuffer* doc_buf){
 	int new_line_counter;
@@ -50,12 +78,10 @@ void cursor_motion(char c, DocBuffer* doc_buf){
 				}
 			}
 			break;
+		case 'i':
+			insert_mode(doc_buf);
+			break;
 	}		
-}
-
-void insert_mode(DocBuffer* doc_buf){
-	//TODO Finish
-	printf("Insert Mode");
 }
 
 void handle_inputs(char c, DocBuffer* doc_buf){
