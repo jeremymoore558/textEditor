@@ -53,6 +53,7 @@ int main(){
 
 	DocBuffer *doc_buf;
 	doc_buf = (DocBuffer*)malloc(sizeof(DocBuffer));
+	doc_buf->exit_status = 0;
 	read_text_file(filename, doc_buf);
 	print_buffer(doc_buf);
 
@@ -66,7 +67,7 @@ int main(){
 		clear_screen();
 		//print_inputs(c);
 		print_buffer(doc_buf);
-		if (c == 'q') break;	
+		if (doc_buf->exit_status == 1) break;	
 	};
 	return 0;
 }

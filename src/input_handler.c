@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include "document_buffer.h"
 #include "insert_mode.h"
+#include "command_mode.h"
 
 void move_cursor_down(DocBuffer* doc_buf){
 	doc_buf->cursor.left += 1;
@@ -87,6 +88,9 @@ void handle_inputs(char c, DocBuffer* doc_buf){
 			write_char_to_buffer('\n', doc_buf);
 			insert_mode(doc_buf);
 			return;
+		case ':':
+			command_mode(doc_buf);
+			break;
 		default:
 			cursor_motion(c, doc_buf);
 	}

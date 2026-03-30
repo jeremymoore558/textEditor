@@ -3,4 +3,8 @@
 
 void clear_screen();
 
+void disableRawMode();
+
+void enableRawMode();
+
 #endif

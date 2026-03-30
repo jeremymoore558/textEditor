@@ -16,6 +16,7 @@ typedef struct{
 	char buffer[GAP_BUFFER_SIZE];
 	char filename[100];
 	Cursor cursor;
+	int exit_status;
 }DocBuffer;
 
 void read_text_file(char* filename, DocBuffer* doc_buf);
