@@ -18,6 +18,9 @@ void read_text_file(char* filename, DocBuffer* doc_buf){
 }
 
 void print_buffer(DocBuffer* doc_buf){
+	//printf("\033[2J");
+	//printf("\033[H");
+	printf("\x1b[?25l");
 	for (int i=0; i<GAP_BUFFER_SIZE; i++){
 		switch (doc_buf->buffer[i]){
 			case '\0':

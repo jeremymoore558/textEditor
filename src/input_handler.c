@@ -77,8 +77,6 @@ void cursor_motion(char c, DocBuffer* doc_buf){
 
 void handle_inputs(char c, DocBuffer* doc_buf){
 	switch (c){
-		case 'q':
-			return;
 		case 'i':
 			insert_mode(doc_buf);
 			return;
