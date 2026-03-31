@@ -36,5 +36,8 @@ void read_text_file(char* filename, DocBuffer* doc_buf);
 
 void print_buffer(DocBuffer* doc_buf);
 
+// Writes buffer to file doc_buf->filename
+int write_buffer_to_txt(DocBuffer* doc_buf);
+
 #endif
 

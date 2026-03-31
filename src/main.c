@@ -70,5 +70,6 @@ int main(){
 		if (doc_buf->exit_status == 1) break;	
 	};
 	printf("\x1b[?25h");
+	clear_screen();
 	return 0;
 }
